@@ -1,0 +1,7 @@
+﻿/src/.idea/.idea.src.dir/.idea/.gitignore
+/src/.idea/.idea.src.dir/.idea/encodings.xml
+/src/.idea/.idea.src.dir/.idea/indexLayout.xml
+bin
+obj
+/bin
+/obj
