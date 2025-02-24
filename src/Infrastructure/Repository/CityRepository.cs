@@ -32,9 +32,9 @@ public class CityRepository : ICityRepository
     {
         return await _context.citys.FirstAsync(x => x.Name == name);
     }
-    public async Task<City?> GetAsyncByNameArray(List<string> ListCity)
+    public async Task<City?> GetAsyncByNameArray(List<string> listCity)
     {
-        return await _context.citys.Where(c => ListCity.Contains(c.Name)).FirstOrDefaultAsync();
+        return await _context.citys.Where(c => listCity.Contains(c.Name)).FirstOrDefaultAsync();
     }
 
     public async Task UpdateAsync(City city)

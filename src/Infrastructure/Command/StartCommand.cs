@@ -23,7 +23,8 @@ public class StartCommand : IMessageCommand
     public async Task HandleCommand(Update update)
     {
         User? user = update.Message?.From;
-        var appUser = await _appUserService.HandleUserAsync(user);
+        if(user == null) return;
+        await _appUserService.HandleUserAsync(user);
 
         var messageString = "Для подписки на рассылку вакансий используйте /add. \n Например: /add junior .net киев   /add C# remote";
         await _message.Send(messageString, user.Id);

@@ -1,6 +1,8 @@
-﻿using Application.Interfaces;
+﻿using System.Net;
+using Application.Interfaces;
 using Domain.Entities;
 using HtmlAgilityPack;
+using Infrastructure.Builder;
 using Telegram.Bot.Types;
 
 namespace Infrastructure.Service;
@@ -8,9 +10,12 @@ namespace Infrastructure.Service;
 public class VacanciesService : IVacanciesService
 {
     private readonly HttpClient _client;
-    public VacanciesService(HttpClient client) 
+    private readonly VacanciesBuilder _vacanciesBuilder;
+
+    public VacanciesService(HttpClient client, VacanciesBuilder vacanciesBuilder)
     {
         _client = client;
+        _vacanciesBuilder = vacanciesBuilder;
     }   
     public async Task<List<Vacancies>> GetVacancies(IEnumerable<Subscriptions> subscriptions)
     {
@@ -29,11 +34,37 @@ public class VacanciesService : IVacanciesService
                     jobCountDocument = 0;
                     break;
                 }
-                
-                var jobLinkList = document.DocumentNode.SelectSingleNode("//div[@id='pjax-jobs-list']").ChildNodes.Where(x => x.OriginalName == "a").ToList();
-                foreach(var jobLink in jobLinkList)
+                var jobDoc = document.DocumentNode.SelectSingleNode("//div[@id='pjax-jobs-list']");
+                var jobLists = jobDoc?.ChildNodes
+                        .Where(cn => cn.Attributes
+                        .Any(x => x.OriginalName == "tabindex")).ToList();
+
+                foreach(var job in jobLists)
                 {
-                    vacanciesUrls.Add(jobLink.Attributes.First().Value);
+                    var jobTitle = job.Descendants("h2")
+                        .FirstOrDefault()?
+                        .Descendants("a")
+                        .FirstOrDefault()?
+                        .InnerText.Trim();
+                    var jobSalary = job.Descendants("span")
+                        .FirstOrDefault(c => c.Attributes["class"]?.Value == "strong-600")?
+                        .InnerText.Trim();
+                    var jobSalaryFormatted = WebUtility.HtmlDecode(jobSalary);
+
+                    var jobCompany = job.Descendants()
+                        .FirstOrDefault(c => c.Attributes["class"]?.Value == "mr-xs")?
+                        .Descendants("span")
+                        .FirstOrDefault()?
+                        .InnerText.Trim();
+                    
+                    var jobDescription = job.Descendants("p")
+                        .FirstOrDefault(p => p.Attributes["class"]?.Value == "ellipsis ellipsis-line ellipsis-line-3 text-default-7 mb-0")?
+                        .InnerText.Trim();
+                    
+                    var vacancies = _vacanciesBuilder
+                        .SetDescription(jobDescription)
+                        .SetSalary(jobSalaryFormatted)
+                        .Build();
                     jobCountDocument--;
                 }
                 index++;

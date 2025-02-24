@@ -41,7 +41,17 @@ public class AddCommand : IMessageCommand
 
     public async Task HandleCommand(Update update)
     {
+        if (update.Message == null)
+        {
+            _logger.MessageIsNull(update.Id);
+            return;
+        }
         User user = update.Message.From;
+        if (user == null)
+        {
+            _logger.UserIsNull(update.Id);
+            return;
+        }
         string messageText = update.Message.Text.Replace(CommandName, "").Trim();
 
         var words = _parseMessage.SubscriptionsParse(update);

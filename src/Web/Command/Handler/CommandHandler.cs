@@ -17,20 +17,17 @@ public class CommandHadler
 
     public ICommand? GetCommand(Update upd)
     {
-        if (upd.MyChatMember != null 
-            && upd.Type == UpdateType.MyChatMember)
+        if (upd is { MyChatMember: not null, Type: UpdateType.MyChatMember })
         {
             return _commandsRegistry.GetCommandHandler(upd.MyChatMember.NewChatMember.Status);
         }
-        else if (upd.Message != null 
-            && upd.Type == UpdateType.Message 
-            &&  upd.Message.Entities.Any(x => x.Type == MessageEntityType.BotCommand))
+        else if (upd.Type == UpdateType.Message 
+                &&  (upd.Message?.Entities?.Any(x => x.Type == MessageEntityType.BotCommand) ?? false))
         {
-            var command = upd.Message.Entities.Where(x => x.Type == MessageEntityType.BotCommand).First();
+            var command = upd.Message.Entities.First(x => x.Type == MessageEntityType.BotCommand);
             return _commandsRegistry.GetCommandHandler(upd.Message.Text.Substring(command.Offset,command.Length));
         }
-        else if (upd.CallbackQuery != null
-            && upd.Type == UpdateType.CallbackQuery)
+        else if (upd is { CallbackQuery: not null, Type: UpdateType.CallbackQuery })
         {
             return _commandsRegistry.GetCommandHandler("callBack");
         }

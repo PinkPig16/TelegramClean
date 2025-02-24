@@ -10,5 +10,5 @@ public interface ICityRepository
     Task UpdateAsync(City city);
     Task DeleteAsync(City city);
     Task SaveChangeAsync();
-    Task<City> GetAsyncByNameArray(List<string> names);
+    Task<City?> GetAsyncByNameArray(List<string> names);
 }

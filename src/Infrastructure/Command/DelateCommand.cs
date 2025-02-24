@@ -53,9 +53,6 @@ namespace Infrastructure.Command
             {
                 await _botClient.SendMessage(update.Message.Chat, $"Удалил подписку *{subscription.Name}*",ParseMode.MarkdownV2);
             }
-
-
-
         }
     }
 }

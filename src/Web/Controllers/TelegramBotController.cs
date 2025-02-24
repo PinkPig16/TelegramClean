@@ -11,36 +11,28 @@ namespace Web.Controllers;
 public class TelegramBotController : Controller
 {
     private readonly IParse _parse;
-    private readonly CommandHadler _commandHadler;
+    private readonly CommandHadler _commandHandler;
     private readonly ILogger _logger;
-
-    public TelegramBotController(CommandsRegistry commandsRegistry,
-                                IParse parse,
-                                CommandHadler commandHadler,
+    public TelegramBotController(IParse parse,
+                                CommandHadler commandHandler,
                                 ILogger<TelegramBotController> logger)
     {
         _parse = parse;
-        _commandHadler = commandHadler;
+        _commandHandler = commandHandler;
         _logger = logger;
     }
-
-
-
-
+    
     [HttpPost]
     [Route("update")]
     public async Task<IActionResult> Update([FromBody] Update update)
     {
-        if (update == null) return Ok();
-
-        var command = _commandHadler.GetCommand(update);
+        var command = _commandHandler.GetCommand(update);
 
         if (command == null)
         {
-            _logger.MethotNotExist(update.Id);
+            _logger.MethodNotExist(update.Id);
             return Ok();
         }
-        
         await command.HandleCommand(update);
 
         return Ok();

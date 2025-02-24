@@ -16,7 +16,6 @@ using Telegram.Bot;
 using Infrastructure.Mapping;
 using Infrastructure.Builder;
 using Infrastructure.Parse;
-using Web.Validate;
 
 
 
@@ -29,7 +28,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
 var botConfigSection = builder.Configuration.GetSection("TelegramBot");
@@ -43,6 +42,7 @@ builder.Services.AddScoped<IMessageCommand, CallbackCommand>();
 builder.Services.AddScoped<IMessageCommand, ListCommand>(); 
 builder.Services.AddScoped<IMessageCommand, DelateCommand>();
 builder.Services.AddScoped<TextGenerationService>();
+builder.Services.AddScoped<VacanciesBuilder>();
 builder.Services.AddScoped<CallbackBase, CallbackDTO>();
 builder.Services.AddScoped<ICallbackFactory, CallbackFactory>();
 builder.Services.AddScoped<IMember, DeleteMember>();
@@ -51,6 +51,7 @@ builder.Services.AddScoped<IVacanciesService, VacanciesService>();
 builder.Services.AddScoped<ParseMessage>();
 builder.Services.AddTransient<Subscriptions>();
 builder.Services.AddTransient<City>();
+builder.Services.AddTransient<Vacancies>();
 builder.Services.AddScoped<AppUserService>();
 builder.Services.AddScoped<SubscriptionsService>();
 builder.Services.AddScoped<CityService>();
@@ -84,18 +85,16 @@ using (var scoped = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 //TODO Middleware
 //app.UseMiddleware<ValidatorMiddleware>();
-
+app.Use((context, next) => next());
 app.MapControllers();
 
 app.Run();

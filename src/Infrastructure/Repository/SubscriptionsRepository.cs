@@ -81,7 +81,7 @@ public class SubscriptionsRepository : ISubscriptionsRepository
 
     public async Task<IEnumerable<Subscriptions>> GetSubscriptionsBySub()
     {
-        return await _context.subscriptions.Where(x => x.sub).ToListAsync();
+        return await _context.subscriptions.Where(x => x.SubscriptionАvailable).ToListAsync();
     }
 }
 

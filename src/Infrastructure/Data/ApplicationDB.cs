@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using Infrastructure.Configuration;
 
 namespace Infrastructure.Data;
 public class ApplicationDB : DbContext
@@ -8,6 +9,7 @@ public class ApplicationDB : DbContext
     public DbSet<Subscriptions> subscriptions { get; set; } = null!;
     public DbSet<Vacancies> vacancies { get; set; } = null!;
     public DbSet<City> citys { get; set; } = null!;
+    public DbSet<SubscriptionsVacancies> subscriptionsVacancies { get; set; } = null!;
     public ApplicationDB(DbContextOptions<ApplicationDB> options) : base(options)
     {
 
@@ -18,11 +20,8 @@ public class ApplicationDB : DbContext
         modelBuilder.Entity<Vacancies>()
             .HasIndex(v => new { v.URL, v.SiteName })
             .IsUnique();
-
-/*        modelBuilder.Entity<Subscriptions>()
-            .HasMany(e => vacancies)
-            .WithMany(e => subscriptions);*/
-
+        modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+        modelBuilder.ApplyConfiguration(new SubscriptionsVacanciesConfiguration());
     }
 }
 

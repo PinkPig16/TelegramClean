@@ -11,7 +11,7 @@ namespace Infrastructure.Command;
 
 public class CallbackCommand : IMessageCommand
 {
-    public readonly ISubscriptionsRepository _subscriptionsRepository;
+    private readonly ISubscriptionsRepository _subscriptionsRepository;
     private readonly IMessage _message;
     private readonly CallbackBase _callback;
 
@@ -34,7 +34,7 @@ public class CallbackCommand : IMessageCommand
 
         if (callbackDTO.Action == "yes")
         {
-            subscriptions.sub = true;
+            subscriptions.SubscriptionАvailable = true;
             var editMessageTask = _message.EditMessage(update.CallbackQuery.Message.Chat, update.CallbackQuery.Message.MessageId, $"Добавлен \n {subscriptions.Url}");
             var subscriptionUpdateTask = _subscriptionsRepository.UpdateAsync(subscriptions);
             await Task.WhenAll(editMessageTask, subscriptionUpdateTask);
